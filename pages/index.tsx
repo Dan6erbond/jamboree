@@ -36,6 +36,7 @@ const Home: NextPage = () => {
     if (!username) {
       setModalOpened(true);
       setNextRoute("/parties/create");
+      return;
     }
     router.push("/parties/create");
   }, [username, router]);
