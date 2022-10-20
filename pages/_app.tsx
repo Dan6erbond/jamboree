@@ -4,6 +4,7 @@ import {
   AppShell,
   ColorScheme,
   ColorSchemeProvider,
+  Group,
   Header,
   MantineProvider,
   Title,
@@ -11,6 +12,7 @@ import {
 import { useColorScheme, useHotkeys, useLocalStorage } from "@mantine/hooks";
 import { IconMoon, IconSunHigh } from "@tabler/icons";
 import { getCookie, setCookie } from "cookies-next";
+import { Emoji, EmojiStyle } from "emoji-picker-react";
 import { GetServerSidePropsContext } from "next";
 import type { AppProps } from "next/app";
 import Head from "next/head";
@@ -71,14 +73,17 @@ function MyApp({ Component, pageProps }: AppProps) {
                 }}
               >
                 <Link href="/">
-                  <Title
-                    sx={{
-                      fontFamily: "Lobster",
-                      ":hover": { cursor: "pointer" },
-                    }}
-                  >
-                    Jamboree 🎉
-                  </Title>
+                  <Group>
+                    <Title
+                      sx={{
+                        fontFamily: "Lobster",
+                        ":hover": { cursor: "pointer" },
+                      }}
+                    >
+                      Jamboree
+                    </Title>
+                    <Emoji unified="1f389" emojiStyle={EmojiStyle.TWITTER} />
+                  </Group>
                 </Link>
                 <ActionIcon onClick={() => toggleColorScheme()}>
                   {colorScheme === "dark" ? <IconSunHigh /> : <IconMoon />}
