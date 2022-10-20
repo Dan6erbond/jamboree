@@ -1,18 +1,20 @@
 import "@fontsource/lobster";
 import {
+  ActionIcon,
   AppShell,
   ColorScheme,
   ColorSchemeProvider,
-  Navbar,
-  Title,
-  MantineProvider,
   Header,
+  MantineProvider,
+  Title,
 } from "@mantine/core";
 import { useColorScheme, useHotkeys, useLocalStorage } from "@mantine/hooks";
+import { IconMoon, IconSunHigh } from "@tabler/icons";
 import { getCookie, setCookie } from "cookies-next";
 import { GetServerSidePropsContext } from "next";
 import type { AppProps } from "next/app";
 import Head from "next/head";
+import Link from "next/link";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const preferredColorScheme = useColorScheme();
@@ -59,8 +61,28 @@ function MyApp({ Component, pageProps }: AppProps) {
           <AppShell
             padding="md"
             header={
-              <Header height={70} p="md">
-                <Title sx={{ fontFamily: "Lobster" }}>Jamboree 🎉</Title>
+              <Header
+                height={70}
+                p="md"
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Link href="/">
+                  <Title
+                    sx={{
+                      fontFamily: "Lobster",
+                      ":hover": { cursor: "pointer" },
+                    }}
+                  >
+                    Jamboree 🎉
+                  </Title>
+                </Link>
+                <ActionIcon onClick={() => toggleColorScheme()}>
+                  {colorScheme === "dark" ? <IconSunHigh /> : <IconMoon />}
+                </ActionIcon>
               </Header>
             }
             sx={(theme) => ({
