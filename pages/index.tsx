@@ -1,36 +1,21 @@
-import {
-  Box,
-  Button,
-  Container,
-  Modal,
-  Stack,
-  TextInput,
-  Title,
-  useMantineTheme,
-} from "@mantine/core";
-import { useLocalStorage } from "@mantine/hooks";
-import { IconArrowBigRightLine, IconHash, IconUser } from "@tabler/icons";
+import { Box, Button, Container, Stack, TextInput, Title } from "@mantine/core";
+import { IconArrowBigRightLine, IconHash } from "@tabler/icons";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback, useState } from "react";
+import { UsernameModal } from "../src/components/UsernameModal";
+import { useUsername } from "../src/hooks/useUsername";
 
 const Home: NextPage = () => {
   const router = useRouter();
-  const theme = useMantineTheme();
 
   const [modalOpened, setModalOpened] = useState(false);
   const [nextRoute, setNextRoute] = useState("");
 
-  const [nameInput, setNameInput] = useState("");
-  const [nameInputValid, setNameInputValid] = useState(true);
-
   const [partyCode, setPartyCode] = useState("");
   const [partyCodeValid, setPartyCodeValid] = useState(true);
 
-  const [username, setUsername] = useLocalStorage<string>({
-    key: "jamboree-username",
-    getInitialValueInEffect: true,
-  });
+  const [username, setUsername] = useUsername();
 
   const createParty = useCallback(() => {
     if (!username) {
@@ -56,19 +41,12 @@ const Home: NextPage = () => {
     [username, router, partyCode]
   );
 
-  const onModalClose = useCallback(() => {}, []);
-
   const onNameSubmit = useCallback(
-    (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      if (nameInput) {
-        setUsername(nameInput);
-        router.push(nextRoute);
-      } else {
-        setNameInputValid(false);
-      }
+    (username: string) => {
+      setUsername(username);
+      router.push(nextRoute);
     },
-    [setUsername, nameInput, nextRoute, router, setNameInputValid]
+    [setUsername, router, nextRoute]
   );
 
   return (
@@ -80,38 +58,7 @@ const Home: NextPage = () => {
         gap: 64,
       }}
     >
-      <Modal
-        opened={modalOpened}
-        onClose={onModalClose}
-        title="Introduce yourself!"
-        centered
-        overlayColor={
-          theme.colorScheme === "dark"
-            ? theme.colors.dark[9]
-            : theme.colors.gray[2]
-        }
-        overlayOpacity={0.55}
-        overlayBlur={3}
-      >
-        <form onSubmit={onNameSubmit}>
-          <Stack>
-            <TextInput
-              label="Enter your Name"
-              icon={<IconUser />}
-              onChange={(e) => setNameInput(e.target.value)}
-              error={!nameInputValid}
-            />
-            <Button
-              sx={{ marginLeft: "auto" }}
-              color="pink"
-              variant="outline"
-              type="submit"
-            >
-              Go!
-            </Button>
-          </Stack>
-        </form>
-      </Modal>
+      <UsernameModal opened={modalOpened} onSubmit={onNameSubmit} />
       <Box sx={{ height: 64 }} />
       <Title
         sx={{ fontFamily: "Lobster", fontSize: "4rem", textAlign: "center" }}

@@ -1,25 +1,24 @@
+import { uuidv4 } from "@firebase/util";
 import {
-  ActionIcon,
   Button,
   Checkbox,
   Container,
   Group,
-  Loader,
   Stack,
   TextInput,
-  Title,
+  Title
 } from "@mantine/core";
-import { DatePicker, TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
-import { useClipboard, useLocalStorage } from "@mantine/hooks";
-import { IconHash, IconMapPin, IconPlus } from "@tabler/icons";
+import { IconMapPin, IconPlus } from "@tabler/icons";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { NextPage } from "next";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { firestore } from "../../src/firebase/firestore";
+import { DateTimePicker } from "../../src/components/DateTimePicker";
+import { firestore, partiesCollection } from "../../src/firebase/firestore";
 import { useRandomName } from "../../src/hooks/useRandomName";
+import { useUsername } from "../../src/hooks/useUsername";
 import { Party } from "../../src/types/party";
 import { generateString } from "../../src/utils/generateRandomString";
 
@@ -30,23 +29,30 @@ interface PartyFormValues {
   allowOptionsWhen: boolean;
 }
 
+const PartyLink = dynamic(
+  () => {
+    return import("../../src/components/PartyLink").then(
+      (mod) => mod.PartyLink
+    );
+  },
+  { ssr: false }
+);
+
 const Create: NextPage = () => {
   const router = useRouter();
   const { randomName, generateRandomName } = useRandomName();
   const [randomNameUnique, setRandomNameUnique] = useState(false);
   const [creatingParty, setCreatingParty] = useState(false);
 
-  const [username, setUsername] = useLocalStorage<string>({
-    key: "jamboree-username",
-    getInitialValueInEffect: true,
-  });
+  const [username] = useUsername();
 
   useEffect(() => {
     const checkName = async () => {
       if (!randomNameUnique && randomName) {
-        const docRef = doc(firestore, "parties", randomName);
+        const docRef = doc(partiesCollection, randomName);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
+          console.log(docSnap.exists());
           generateRandomName();
         } else {
           setRandomNameUnique(true);
@@ -55,12 +61,6 @@ const Create: NextPage = () => {
     };
     checkName();
   }, [randomName, randomNameUnique, generateRandomName]);
-
-  const clipboard = useClipboard({ timeout: 500 });
-
-  const copyRandomName = useCallback(() => {
-    clipboard.copy(`${window.location.origin}/parties/join/${randomName}`);
-  }, [clipboard, randomName]);
 
   const form = useForm<PartyFormValues>({
     initialValues: {
@@ -71,43 +71,14 @@ const Create: NextPage = () => {
     },
   });
 
-  const [dates, setDates] = useState<{ uuid: string; date: Date | null }[]>([
+  const [dates, setDates] = useState<{ uuid: string; date: Date }[]>([
     { uuid: uuidv4(), date: new Date() },
   ]);
 
   const setDate = useCallback(
-    (uuid: string, date: Date | null, setter: "time" | "date") => {
+    (uuid: string, date: Date) => {
       setDates((dates) =>
-        dates.map((dt) => {
-          if (dt.uuid === uuid) {
-            if (date === null) {
-              return { uuid, date: null };
-            }
-            const newDate = new Date();
-            if (dt.date) {
-              switch (setter) {
-                case "date":
-                  newDate.setHours(dt.date.getHours());
-                  newDate.setMinutes(dt.date.getMinutes());
-
-                  newDate.setDate(date.getDate());
-                  newDate.setMonth(date.getMonth());
-                  newDate.setFullYear(date.getFullYear());
-                  break;
-                case "time":
-                  newDate.setDate(dt.date.getDate());
-                  newDate.setMonth(dt.date.getMonth());
-                  newDate.setFullYear(dt.date.getFullYear());
-
-                  newDate.setHours(date.getHours());
-                  newDate.setMinutes(date.getMinutes());
-                  break;
-              }
-            }
-            return { uuid, date: newDate };
-          }
-          return dt;
-        })
+        dates.map((dt) => (dt.uuid === uuid ? { ...dt, date } : dt))
       );
     },
     [setDates]
@@ -177,33 +148,7 @@ const Create: NextPage = () => {
         <Title sx={{ fontFamily: "Lobster" }} order={1}>
           New Party
         </Title>
-        <Group>
-          <ActionIcon
-            color="pink"
-            variant="light"
-            sx={{ padding: 4 }}
-            onClick={randomNameUnique ? copyRandomName : undefined}
-          >
-            <IconHash />
-          </ActionIcon>
-          {randomNameUnique ? (
-            <Title
-              order={2}
-              size="h1"
-              sx={(theme) => ({
-                color:
-                  theme.colorScheme === "dark"
-                    ? theme.colors.gray[6]
-                    : theme.colors.dark[6],
-                fontWeight: "lighter",
-              })}
-            >
-              {randomName}
-            </Title>
-          ) : (
-            <Loader />
-          )}
-        </Group>
+        <PartyLink partyId={randomName} loadingPartyId={!randomNameUnique} />
         <form onSubmit={form.onSubmit(createParty)}>
           <Stack>
             <Title order={3}>When?</Title>
@@ -226,23 +171,11 @@ const Create: NextPage = () => {
             <Stack>
               <Stack>
                 {dates.map(({ uuid, date }, idx) => (
-                  <Group key={uuid}>
-                    <DatePicker
-                      placeholder="Date"
-                      withAsterisk
-                      size="md"
-                      disabled={!form.values.allowVotingWhen && idx !== 0}
-                      value={date}
-                      onChange={(d) => setDate(uuid, d, "date")}
-                    />
-                    <TimeInput
-                      withAsterisk
-                      size="md"
-                      disabled={!form.values.allowVotingWhen && idx !== 0}
-                      value={date}
-                      onChange={(d) => setDate(uuid, d, "time")}
-                    />
-                  </Group>
+                  <DateTimePicker
+                    key={uuid}
+                    value={date}
+                    onChange={(date) => setDate(uuid, date)}
+                  />
                 ))}
               </Stack>
               {form.values.allowVotingWhen && (

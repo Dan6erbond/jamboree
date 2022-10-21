@@ -5,7 +5,7 @@ export interface Supply {
   uuid: UUID;
   name: string;
   quantity: number;
-  assignee: User;
+  assignee: User | null;
   isUrgent: boolean;
   emoji: string;
 }
