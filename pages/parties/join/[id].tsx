@@ -1,4 +1,4 @@
-import { uuidv4 } from "@firebase/util";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import {
   ActionIcon,
   Avatar,
@@ -29,17 +29,31 @@ import {
   IconUrgent,
   IconZzz,
 } from "@tabler/icons";
-import { Timestamp, updateDoc } from "firebase/firestore";
 import { NextPage } from "next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { BotttsAvatar } from "../../../src/components/BotttsAvatar";
 import { EmojiPickerButton } from "../../../src/components/EmojiPickerButton";
 import { UsernameModal } from "../../../src/components/UsernameModal";
-import { useGetParty } from "../../../src/hooks/useGetParty";
+import { GET_PARTY } from "../../../src/queries/GetParty";
+import {
+  GetParty,
+  GetPartyVariables,
+} from "../../../src/queries/__generated__/GetParty";
 import { getRandomEmoji } from "../../../src/utils/getRandomEmoji";
 import { isValidUrl } from "../../../src/utils/utils";
+import { AddSupply, AddSupplyVariables } from "./__generated__/AddSupply";
+import {
+  DeleteSupply,
+  DeleteSupplyVariables,
+} from "./__generated__/DeleteSupply";
+import { EditSupply, EditSupplyVariables } from "./__generated__/EditSupply";
+import {
+  ToggleDateVote,
+  ToggleDateVoteVariables,
+} from "./__generated__/ToggleDateVote";
+import { ToggleLocationVote } from "./__generated__/ToggleLocationVote";
 
 const PartyLink = dynamic(
   () => {
@@ -50,8 +64,65 @@ const PartyLink = dynamic(
   { ssr: false }
 );
 
+const ADD_SUPPLY = gql`
+  mutation AddSupply($payload: AddSupplyPayload!) {
+    addSupply(payload: $payload) {
+      id
+      name
+      quantity
+      assignee
+      isUrgent
+      emoji
+    }
+  }
+`;
+
+const DELETE_SUPPLY = gql`
+  mutation DeleteSupply($supplyId: Int!) {
+    deleteSupply(supplyId: $supplyId) {
+      success
+    }
+  }
+`;
+
+const EDIT_SUPPLY = gql`
+  mutation EditSupply($payload: EditSupplyPayload!) {
+    editSupply(payload: $payload) {
+      id
+      assignee
+      emoji
+      isUrgent
+      name
+      quantity
+    }
+  }
+`;
+
+const TOGGLE_DATE_VOTE = gql`
+  mutation ToggleDateVote($id: Int!, $username: String!) {
+    toggleDateVote(partyDateId: $id, username: $username) {
+      id
+      username
+    }
+  }
+`;
+
+const TOGGLE_LOCATION_VOTE = gql`
+  mutation ToggleLocationVote($id: Int!, $username: String!) {
+    toggleLocationVote(partyLocationId: $id, username: $username) {
+      id
+      username
+    }
+  }
+`;
+
 const Join: NextPage = () => {
   const router = useRouter();
+  const partyName = useMemo(
+    () =>
+      Array.isArray(router.query.id) ? router.query.id[0] : router.query.id!,
+    [router]
+  );
   const { colorScheme } = useMantineColorScheme();
 
   const [username, setUsername] = useLocalStorage<string>({
@@ -59,72 +130,79 @@ const Join: NextPage = () => {
     getInitialValueInEffect: true,
   });
 
-  const { party, docRef, getParty } = useGetParty({
-    id: Array.isArray(router.query.id) ? router.query.id[0] : router.query.id!,
+  const { data, refetch, startPolling } = useQuery<GetParty, GetPartyVariables>(
+    GET_PARTY,
+    {
+      variables: {
+        partyName,
+      },
+    }
+  );
+  useEffect(() => {
+    // https://github.com/apollographql/apollo-client/issues/9819
+    startPolling(500);
   });
 
   const [showNotification, setShowNotification] = useState(true);
 
   const totalDateVotes = useMemo(() => {
     let total = 0;
-    if (party) {
-      for (const date of party.dates) {
+    if (data?.party) {
+      for (const date of data?.party.dates) {
         total += date.votes.length;
       }
     }
     return total;
-  }, [party]);
+  }, [data]);
 
   const totalLocationVotes = useMemo(() => {
     let total = 0;
-    if (party) {
-      for (const location of party.locations) {
+    if (data?.party) {
+      for (const location of data?.party.locations) {
         total += location.votes.length;
       }
     }
     return total;
-  }, [party]);
+  }, [data]);
 
   const [newSupplyEmoji, setNewSupplyEmoji] = useState(getRandomEmoji().u);
   const [newSupplyText, setNewSupplyText] = useState("");
   const [newSupplyUrgent, setNewSupplyUrgent] = useState(false);
 
+  const [addNewSupplyMutation] = useMutation<AddSupply, AddSupplyVariables>(
+    ADD_SUPPLY,
+    {
+      variables: {
+        payload: {
+          partyName: data?.party?.name as string,
+          name: newSupplyText,
+          emoji: newSupplyEmoji,
+          isUrgent: newSupplyUrgent,
+        },
+      },
+    }
+  );
+
   const addNewSupply = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      if (party) {
-        const newParty = {
-          supplies: [
-            ...party.supplies,
-            {
-              uuid: uuidv4(),
-              name: newSupplyText,
-              quantity: 1,
-              assignee: null,
-              isUrgent: newSupplyUrgent,
-              emoji: newSupplyEmoji,
-            },
-          ],
-        };
-        await updateDoc(docRef!, newParty);
-        getParty();
-        setNewSupplyEmoji(getRandomEmoji().u);
-      }
+      await addNewSupplyMutation();
+      refetch();
     },
-    [
-      newSupplyText,
-      newSupplyUrgent,
-      newSupplyEmoji,
-      setNewSupplyEmoji,
-      party,
-      docRef,
-      getParty,
-    ]
+    [addNewSupplyMutation, refetch]
+  );
+
+  const [deleteSupply] = useMutation<DeleteSupply, DeleteSupplyVariables>(
+    DELETE_SUPPLY
+  );
+
+  const [editSupply] = useMutation<EditSupply, EditSupplyVariables>(
+    EDIT_SUPPLY
   );
 
   const updateSupply = useCallback(
     async (
-      uuid: string,
+      id: number,
       newValue: {
         emoji?: string;
         quantity?: number;
@@ -132,105 +210,40 @@ const Join: NextPage = () => {
         assignee?: string | null;
       }
     ) => {
-      if (party) {
-        if (newValue.quantity === 0) {
-          await updateDoc(docRef!, {
-            supplies: party.supplies.filter((supply) => supply.uuid !== uuid),
-          });
-          getParty();
-          return;
-        }
-        await updateDoc(docRef!, {
-          supplies: party.supplies.map((supply) => {
-            if (supply.uuid === uuid) {
-              if (newValue.emoji) {
-                return {
-                  ...supply,
-                  emoji: newValue.emoji,
-                };
-              }
-              if (newValue.quantity) {
-                return {
-                  ...supply,
-                  quantity: newValue.quantity,
-                };
-              }
-              if (newValue.isUrgent !== undefined) {
-                return {
-                  ...supply,
-                  isUrgent: newValue.isUrgent,
-                };
-              }
-              if (newValue.assignee !== undefined) {
-                return {
-                  ...supply,
-                  assignee: newValue.assignee,
-                };
-              }
-            }
-            return supply;
-          }),
-        });
-        getParty();
+      if (newValue.quantity === 0) {
+        await deleteSupply({ variables: { supplyId: id } });
+        await refetch();
+      } else {
+        await editSupply({ variables: { payload: { id, ...newValue } } });
       }
     },
-    [party, docRef, getParty]
+    [deleteSupply, editSupply, refetch]
   );
+
+  const [toggleDateVoteMutation] = useMutation<
+    ToggleDateVote,
+    ToggleDateVoteVariables
+  >(TOGGLE_DATE_VOTE);
 
   const toggleDateVote = useCallback(
-    async (uuid: string) => {
-      if (party) {
-        const newParty = {
-          dates: party.dates.map((dt) => {
-            if (dt.uuid === uuid) {
-              if (dt.votes.includes(username)) {
-                return {
-                  ...dt,
-                  votes: dt.votes.filter((val) => val !== username),
-                };
-              } else {
-                return {
-                  ...dt,
-                  votes: [...dt.votes, username],
-                };
-              }
-            }
-            return dt;
-          }),
-        };
-        await updateDoc(docRef!, newParty);
-        getParty();
-      }
+    async (id: number) => {
+      await toggleDateVoteMutation({ variables: { id, username } });
+      await refetch();
     },
-    [username, party, docRef, getParty]
+    [username, toggleDateVoteMutation, refetch]
   );
 
+  const [toggleLocationVoteMutation] = useMutation<
+    ToggleLocationVote,
+    ToggleDateVoteVariables
+  >(TOGGLE_LOCATION_VOTE);
+
   const toggleLocationVote = useCallback(
-    async (uuid: string) => {
-      if (party) {
-        const newParty = {
-          locations: party.locations.map((loc) => {
-            if (loc.uuid === uuid) {
-              if (loc.votes.includes(username)) {
-                return {
-                  ...loc,
-                  votes: loc.votes.filter((val) => val !== username),
-                };
-              } else {
-                return {
-                  ...loc,
-                  votes: [...loc.votes, username],
-                };
-              }
-            }
-            return loc;
-          }),
-        };
-        await updateDoc(docRef!, newParty);
-        getParty();
-      }
+    async (id: number) => {
+      await toggleLocationVoteMutation({ variables: { id, username } });
+      await refetch();
     },
-    [username, party, docRef, getParty]
+    [username, toggleLocationVoteMutation, refetch]
   );
 
   return (
@@ -250,7 +263,9 @@ const Join: NextPage = () => {
           <Title sx={{ fontFamily: "Lobster" }} order={1}>
             Join Party
           </Title>
-          {party && party.creator && <BotttsAvatar username={party.creator} />}
+          {data?.party && data?.party.creator && (
+            <BotttsAvatar username={data.party.creator} />
+          )}
         </Group>
         <PartyLink
           partyId={
@@ -261,19 +276,28 @@ const Join: NextPage = () => {
         />
         <Stack>
           <Title order={3}>When?</Title>
-          {party?.dates.map(({ uuid, date, votes }) => (
-            <Stack key={uuid}>
+          {data?.party!.dates.map(({ id, date, votes }) => (
+            <Stack key={id}>
               <Button
                 color="pink"
-                variant={votes.includes(username) ? "light" : "default"}
+                variant={
+                  votes.findIndex((vote) => vote.username === username) !== -1
+                    ? "light"
+                    : "default"
+                }
                 rightIcon={
                   <IconThumbUp
-                    fill={votes.includes(username) ? "white" : "none"}
+                    fill={
+                      votes.findIndex((vote) => vote.username === username) !==
+                      -1
+                        ? "white"
+                        : "none"
+                    }
                   />
                 }
-                onClick={() => toggleDateVote(uuid)}
+                onClick={() => toggleDateVote(id)}
               >
-                {(date as unknown as Timestamp).toDate().toLocaleString()}
+                {new Date(Date.parse(date)).toLocaleString()}
               </Button>
               <Progress
                 color="pink"
@@ -281,13 +305,13 @@ const Join: NextPage = () => {
                 striped
               />
               <Avatar.Group spacing="sm">
-                {votes.map((user) => (
-                  <BotttsAvatar key={user} username={user} />
+                {votes.map((vote) => (
+                  <BotttsAvatar key={vote.username} username={vote.username} />
                 ))}
               </Avatar.Group>
             </Stack>
           ))}
-          {party?.settings.date.userOptions && (
+          {data?.party!.settings.dates.optionsEnabled && (
             <Stack>
               <Button rightIcon={<IconPlus />} variant="default" disabled>
                 New Option
@@ -299,19 +323,29 @@ const Join: NextPage = () => {
             </Stack>
           )}
           <Title order={3}>Where?</Title>
-          {party?.locations.map(({ uuid, location, votes }) => (
-            <Stack key={uuid}>
+          {data?.party!.locations.map(({ id, location, votes }) => (
+            <Stack key={id}>
               <Group>
                 <Button
                   color="pink"
-                  variant={votes.includes(username) ? "light" : "default"}
+                  variant={
+                    votes.findIndex((vote) => vote.username === username) !== -1
+                      ? "light"
+                      : "default"
+                  }
                   rightIcon={
                     <IconThumbUp
-                      fill={votes.includes(username) ? "white" : "none"}
+                      fill={
+                        votes.findIndex(
+                          (vote) => vote.username === username
+                        ) !== -1
+                          ? "white"
+                          : "none"
+                      }
                     />
                   }
                   sx={{ flex: 1 }}
-                  onClick={() => toggleLocationVote(uuid)}
+                  onClick={() => toggleLocationVote(id)}
                 >
                   {location}
                 </Button>
@@ -327,13 +361,13 @@ const Join: NextPage = () => {
                 striped
               />
               <Avatar.Group spacing="sm">
-                {votes.map((user) => (
-                  <BotttsAvatar key={user} username={user} />
+                {votes.map((vote) => (
+                  <BotttsAvatar key={vote.username} username={vote.username} />
                 ))}
               </Avatar.Group>
             </Stack>
           ))}
-          {party?.settings.location.userOptions && (
+          {data?.party!.settings.locations.optionsEnabled && (
             <Stack>
               <Button rightIcon={<IconPlus />} variant="default" disabled>
                 New Option
@@ -350,23 +384,26 @@ const Join: NextPage = () => {
             Supplies
           </Title>
           <Divider />
-          {party?.supplies.map(
-            ({ assignee, isUrgent, name, quantity, uuid, emoji }) => (
-              <Group key={uuid}>
+          {data
+            ?.party!.supplies.sort((supply) => (supply.isUrgent ? 1 : -1))
+            .map(({ assignee, isUrgent, name, quantity, id, emoji }) => (
+              <Group key={id}>
                 <Paper
                   sx={(theme) => ({
                     padding: theme.spacing.md,
                     flex: 1,
-                    background: isUrgent ? theme.colors.red[5] : undefined,
+                    borderColor: isUrgent
+                      ? theme.colors.red[7]
+                      : theme.colors.gray[8],
+                    borderWidth: 2,
+                    borderStyle: "solid",
                   })}
                 >
                   <Stack>
                     <Group>
                       <EmojiPickerButton
                         value={emoji}
-                        onChange={(e) =>
-                          updateSupply(uuid, { emoji: e.unified })
-                        }
+                        onChange={(e) => updateSupply(id, { emoji: e.unified })}
                       />
                       <Group spacing={4} align="top">
                         <Text size="xl">{quantity}</Text>
@@ -389,7 +426,7 @@ const Join: NextPage = () => {
                           color="red"
                           variant={isUrgent ? "filled" : "light"}
                           onClick={() =>
-                            updateSupply(uuid, { isUrgent: !isUrgent })
+                            updateSupply(id, { isUrgent: !isUrgent })
                           }
                         >
                           <IconUrgent />
@@ -399,7 +436,7 @@ const Join: NextPage = () => {
                         <Button
                           variant="default"
                           onClick={() =>
-                            updateSupply(uuid, { quantity: ++quantity })
+                            updateSupply(id, { quantity: ++quantity })
                           }
                         >
                           <IconPlus />
@@ -407,7 +444,7 @@ const Join: NextPage = () => {
                         <Button
                           variant="default"
                           onClick={() =>
-                            updateSupply(uuid, { quantity: --quantity })
+                            updateSupply(id, { quantity: --quantity })
                           }
                         >
                           <IconMinus />
@@ -420,12 +457,16 @@ const Join: NextPage = () => {
                   variant={assignee === username ? "gradient" : "default"}
                   size="xl"
                   sx={{ alignSelf: "stretch", height: "auto", width: 64 }}
+                  onClick={() =>
+                    updateSupply(id, {
+                      assignee: assignee === username ? "" : username,
+                    })
+                  }
                 >
                   <IconHandStop />
                 </ActionIcon>
               </Group>
-            )
-          )}
+            ))}
           <Paper
             sx={(theme) => ({
               padding: theme.spacing.md,
