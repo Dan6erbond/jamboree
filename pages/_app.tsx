@@ -1,3 +1,4 @@
+import { ApolloProvider } from "@apollo/client";
 import "@fontsource/lobster";
 import {
   ActionIcon,
@@ -17,6 +18,7 @@ import { GetServerSidePropsContext } from "next";
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import Link from "next/link";
+import { client } from "../src/apollo-client";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const preferredColorScheme = useColorScheme();
@@ -49,58 +51,60 @@ function MyApp({ Component, pageProps }: AppProps) {
         />
       </Head>
 
-      <ColorSchemeProvider
-        colorScheme={colorScheme}
-        toggleColorScheme={toggleColorScheme}
-      >
-        <MantineProvider
-          withGlobalStyles
-          withNormalizeCSS
-          theme={{
-            colorScheme,
-          }}
+      <ApolloProvider client={client}>
+        <ColorSchemeProvider
+          colorScheme={colorScheme}
+          toggleColorScheme={toggleColorScheme}
         >
-          <AppShell
-            padding="md"
-            header={
-              <Header
-                height={70}
-                p="md"
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Link href="/">
-                  <Group>
-                    <Title
-                      sx={{
-                        fontFamily: "Lobster",
-                        ":hover": { cursor: "pointer" },
-                      }}
-                    >
-                      Jamboree
-                    </Title>
-                    <Emoji unified="1f389" emojiStyle={EmojiStyle.TWITTER} />
-                  </Group>
-                </Link>
-                <ActionIcon onClick={() => toggleColorScheme()}>
-                  {colorScheme === "dark" ? <IconSunHigh /> : <IconMoon />}
-                </ActionIcon>
-              </Header>
-            }
-            sx={(theme) => ({
-              backgroundColor:
-                theme.colorScheme === "dark"
-                  ? theme.colors.dark[6]
-                  : theme.colors.gray[0],
-            })}
+          <MantineProvider
+            withGlobalStyles
+            withNormalizeCSS
+            theme={{
+              colorScheme,
+            }}
           >
-            <Component {...pageProps} />
-          </AppShell>
-        </MantineProvider>
-      </ColorSchemeProvider>
+            <AppShell
+              padding="md"
+              header={
+                <Header
+                  height={70}
+                  p="md"
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Link href="/">
+                    <Group>
+                      <Title
+                        sx={{
+                          fontFamily: "Lobster",
+                          ":hover": { cursor: "pointer" },
+                        }}
+                      >
+                        Jamboree
+                      </Title>
+                      <Emoji unified="1f389" emojiStyle={EmojiStyle.TWITTER} />
+                    </Group>
+                  </Link>
+                  <ActionIcon onClick={() => toggleColorScheme()}>
+                    {colorScheme === "dark" ? <IconSunHigh /> : <IconMoon />}
+                  </ActionIcon>
+                </Header>
+              }
+              sx={(theme) => ({
+                backgroundColor:
+                  theme.colorScheme === "dark"
+                    ? theme.colors.dark[6]
+                    : theme.colors.gray[0],
+              })}
+            >
+              <Component {...pageProps} />
+            </AppShell>
+          </MantineProvider>
+        </ColorSchemeProvider>
+      </ApolloProvider>
     </>
   );
 }
