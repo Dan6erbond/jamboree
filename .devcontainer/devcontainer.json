@@ -14,7 +14,8 @@
 		"dbaeumer.vscode-eslint",
 		"wayou.vscode-todo-highlight",
 		"Gruntfuggly.todo-tree",
-		"esbenp.prettier-vscode"
+		"esbenp.prettier-vscode",
+		"vivaxy.vscode-conventional-commits"
 	]
     }
   },
