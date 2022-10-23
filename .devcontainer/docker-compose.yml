@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VARIANT: 16-bullseye
+    volumes:
+      - ..:/workspace:cached
+      - node_modules:/workspace/node_modules
+      - next_cache:/workspace/.next
+    networks:
+      - jamboree
+
+    # Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+
+volumes:
+  node_modules:
+  next_cache:
+
+networks:
+  jamboree:
+    external: true

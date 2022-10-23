@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "download-schema": "apollo service:download --endpoint=http://localhost:5001/graphql graphql-schema.json",
+    "download-schema": "apollo service:download --endpoint=http://backend:5001/graphql graphql-schema.json",
     "codegen": "apollo codegen:generate --localSchemaFile=graphql-schema.json --includes {pages,src}/**/* --target=typescript --tagName=gql --globalTypesFile=src/types/graphql.ts"
   },
   "dependencies": {

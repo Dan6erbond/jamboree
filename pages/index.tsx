@@ -93,7 +93,7 @@ const Home: NextPage = () => {
       <Title
         sx={{ fontFamily: "Lobster", fontSize: "4rem", textAlign: "center" }}
       >
-        Plan your own Party Right
+        Plan your Party Right!
       </Title>
       <Button
         sx={{ margin: "0 auto" }}
