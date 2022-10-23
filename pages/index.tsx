@@ -1,30 +1,54 @@
+import { gql, useMutation } from "@apollo/client";
 import { Box, Button, Container, Stack, TextInput, Title } from "@mantine/core";
 import { IconArrowBigRightLine, IconHash } from "@tabler/icons";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { UsernameModal } from "../src/components/UsernameModal";
 import { useUsername } from "../src/hooks/useUsername";
+import { CreateParty, CreatePartyVariables } from "./__generated__/CreateParty";
+
+const CREATE_PARTY = gql`
+  mutation CreateParty($username: String!) {
+    createParty(username: $username) {
+      name
+      adminCode
+    }
+  }
+`;
 
 const Home: NextPage = () => {
   const router = useRouter();
 
   const [modalOpened, setModalOpened] = useState(false);
-  const [nextRoute, setNextRoute] = useState("");
+  const [onUsernameSetAction, setOnUsernameSetAction] = useState<
+    "" | "createParty" | "joinParty"
+  >("");
 
   const [partyCode, setPartyCode] = useState("");
   const [partyCodeValid, setPartyCodeValid] = useState(true);
 
   const [username, setUsername] = useUsername();
 
+  const [createPartyMutation, { data, loading, error }] = useMutation<
+    CreateParty,
+    CreatePartyVariables
+  >(CREATE_PARTY, { variables: { username } });
+
+  useEffect(() => {
+    if (data?.createParty.adminCode) {
+      router.push(`/parties/admin/${data?.createParty.adminCode}`);
+    }
+  }, [router, data]);
+
   const createParty = useCallback(() => {
     if (!username) {
       setModalOpened(true);
-      setNextRoute("/parties/create");
+      setOnUsernameSetAction("createParty");
       return;
     }
-    router.push("/parties/create");
-  }, [username, router]);
+    createPartyMutation();
+  }, [username, createPartyMutation]);
 
   const joinParty = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -33,7 +57,7 @@ const Home: NextPage = () => {
         setPartyCodeValid(false);
       } else if (!username) {
         setModalOpened(true);
-        setNextRoute(`/parties/join/${partyCode}`);
+        setOnUsernameSetAction(`joinParty`);
       } else {
         router.push(`/parties/join/${partyCode}`);
       }
@@ -44,9 +68,15 @@ const Home: NextPage = () => {
   const onNameSubmit = useCallback(
     (username: string) => {
       setUsername(username);
-      router.push(nextRoute);
+      switch (onUsernameSetAction) {
+        case "createParty":
+          createPartyMutation();
+          break;
+        case "joinParty":
+          router.push(`/parties/join/${partyCode}`);
+      }
     },
-    [setUsername, router, nextRoute]
+    [setUsername, router, onUsernameSetAction, partyCode, createPartyMutation]
   );
 
   return (
@@ -73,6 +103,7 @@ const Home: NextPage = () => {
         radius="lg"
         size="md"
         onClick={createParty}
+        loading={loading}
       >
         Plan Now
       </Button>
