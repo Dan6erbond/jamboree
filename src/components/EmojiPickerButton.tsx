@@ -6,6 +6,7 @@ import {
   EmojiStyle,
   Theme,
 } from "emoji-picker-react";
+import { useState } from "react";
 
 interface EmojiPickerButtonProps {
   value: string;
@@ -16,12 +17,19 @@ export const EmojiPickerButton = ({
   value,
   onChange,
 }: EmojiPickerButtonProps) => {
+  const [opened, setOpened] = useState(false);
   const { colorScheme } = useMantineColorScheme();
 
   return (
-    <Popover width={350} position="top" shadow="md">
+    <Popover
+      width={350}
+      position="top"
+      shadow="md"
+      opened={opened}
+      onChange={setOpened}
+    >
       <Popover.Target>
-        <Button variant="default">
+        <Button variant="default" onClick={() => setOpened((o) => !o)}>
           <Emoji unified={value} size={25} emojiStyle={EmojiStyle.TWITTER} />
         </Button>
       </Popover.Target>
@@ -36,7 +44,10 @@ export const EmojiPickerButton = ({
         <EmojiPicker
           theme={colorScheme === "dark" ? Theme.DARK : Theme.LIGHT}
           emojiStyle={EmojiStyle.TWITTER}
-          onEmojiClick={(emoji) => onChange?.(emoji)}
+          onEmojiClick={(emoji) => {
+            onChange?.(emoji);
+            setOpened(false);
+          }}
         />
       </Popover.Dropdown>
     </Popover>
