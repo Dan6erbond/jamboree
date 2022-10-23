@@ -1,6 +1,12 @@
 {
   "recommendations": [
     "wayou.vscode-todo-highlight",
-    "Gruntfuggly.todo-tree"
+    "gruntfuggly.todo-tree",
+    "esbenp.prettier-vscode",
+    "vivaxy.vscode-conventional-commits",
+    "aaron-bond.better-comments",
+    "formulahendry.auto-close-tag",
+    "formulahendry.auto-rename-tag",
+    "GraphQL.vscode-graphql-syntax"
   ]
 }
