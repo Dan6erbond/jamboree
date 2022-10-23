@@ -7,6 +7,7 @@
     "aaron-bond.better-comments",
     "formulahendry.auto-close-tag",
     "formulahendry.auto-rename-tag",
-    "GraphQL.vscode-graphql-syntax"
+    "GraphQL.vscode-graphql-syntax",
+    "GitHub.vscode-pull-request-github"
   ]
 }

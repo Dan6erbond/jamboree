@@ -11,12 +11,13 @@
     "vscode": {
       // Add the IDs of extensions you want installed when the container is created.
       "extensions": [
-		"dbaeumer.vscode-eslint",
-		"wayou.vscode-todo-highlight",
-		"Gruntfuggly.todo-tree",
-		"esbenp.prettier-vscode",
-		"vivaxy.vscode-conventional-commits"
-	]
+        "dbaeumer.vscode-eslint",
+        "wayou.vscode-todo-highlight",
+        "Gruntfuggly.todo-tree",
+        "esbenp.prettier-vscode",
+        "vivaxy.vscode-conventional-commits",
+        "GitHub.vscode-pull-request-github"
+      ]
     }
   },
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -34,7 +35,7 @@
     "python": "latest"
   }
 }
-  }
 }
-  }
+}
+}
 }
