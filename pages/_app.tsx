@@ -13,12 +13,18 @@ import {
 import { useColorScheme, useHotkeys, useLocalStorage } from "@mantine/hooks";
 import { IconMoon, IconSunHigh } from "@tabler/icons";
 import { getCookie, setCookie } from "cookies-next";
-import { Emoji, EmojiStyle } from "emoji-picker-react";
+import { EmojiStyle } from "emoji-picker-react";
 import { GetServerSidePropsContext } from "next";
 import type { AppProps } from "next/app";
+import dynamic from "next/dynamic";
 import Head from "next/head";
 import Link from "next/link";
 import { client } from "../src/apollo-client";
+
+const Emoji = dynamic(
+  () => import("emoji-picker-react").then((mod) => mod.Emoji),
+  { ssr: false }
+);
 
 function MyApp({ Component, pageProps }: AppProps) {
   const preferredColorScheme = useColorScheme();
