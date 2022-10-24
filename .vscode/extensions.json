@@ -9,6 +9,7 @@
     "formulahendry.auto-rename-tag",
     "graphql.vscode-graphql-syntax",
     "github.vscode-pull-request-github",
-    "yzhang.markdown-all-in-one"
+    "yzhang.markdown-all-in-one",
+    "redhat.vscode-yaml"
   ]
 }
