@@ -31,12 +31,17 @@ import {
 } from "./__generated__/EditLocation";
 import { EditParty, EditPartyVariables } from "./__generated__/EditParty";
 
+const AdminZoneBanner = dynamic(
+  () =>
+    import("../../../src/components/admin-zone-banner").then(
+      (mod) => mod.AdminZoneBanner
+    ),
+  { ssr: false }
+);
+
 const PartyLink = dynamic(
-  () => {
-    return import("../../../src/components/party-link").then(
-      (mod) => mod.PartyLink
-    );
-  },
+  () =>
+    import("../../../src/components/party-link").then((mod) => mod.PartyLink),
   { ssr: false }
 );
 
@@ -440,6 +445,7 @@ const Admin: NextPage = () => {
             Save
           </Button>
         </Stack>
+        <AdminZoneBanner />
       </Stack>
     </Container>
   );
