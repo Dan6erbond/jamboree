@@ -29,10 +29,12 @@ import {
   IconUrgent,
   IconZzz,
 } from "@tabler/icons";
-import { NextPage } from "next";
+import { GetServerSideProps, GetServerSidePropsContext, NextPage } from "next";
 import dynamic from "next/dynamic";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { addApolloState, initializeApollo } from "../../../src/apollo-client";
 import { BotttsAvatar } from "../../../src/components/BotttsAvatar";
 import { EmojiPickerButton } from "../../../src/components/EmojiPickerButton";
 import { UsernameModal } from "../../../src/components/UsernameModal";
@@ -251,6 +253,14 @@ const Join: NextPage = () => {
 
   return (
     <Container>
+      <Head>
+        <title>Join {data?.party?.name} today!</title>
+        <meta
+          name="description"
+          content={`Join ${data?.party?.name} and help plan the best party ever!`}
+        />
+        <meta name="author" content={data?.party?.creator} />
+      </Head>
       <UsernameModal opened={!username} onSubmit={setUsername} />
       <Stack>
         {showNotification && (
@@ -514,6 +524,31 @@ const Join: NextPage = () => {
       </Stack>
     </Container>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const apolloClient = initializeApollo();
+
+  const query = await apolloClient.query<GetParty, GetPartyVariables>({
+    query: GET_PARTY,
+    variables: {
+      partyName: Array.isArray(context.query.id)
+        ? context.query.id[0]
+        : context.query.id!,
+    },
+  });
+
+  if (!query?.data?.party) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return addApolloState(apolloClient, {
+    props: {},
+  });
 };
 
 export default Join;
