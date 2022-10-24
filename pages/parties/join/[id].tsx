@@ -35,15 +35,15 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { addApolloState, initializeApollo } from "../../../src/apollo-client";
-import { BotttsAvatar } from "../../../src/components/BotttsAvatar";
-import { EmojiPickerButton } from "../../../src/components/EmojiPickerButton";
-import { UsernameModal } from "../../../src/components/UsernameModal";
-import { GET_PARTY } from "../../../src/queries/GetParty";
+import { BotttsAvatar } from "../../../src/components/bottts-avatar";
+import { EmojiPickerButton } from "../../../src/components/emoji-picker-button";
+import { UsernameModal } from "../../../src/components/username-modal";
+import { GET_PARTY } from "../../../src/queries/get-party";
 import {
   GetParty,
   GetPartyVariables,
 } from "../../../src/queries/__generated__/GetParty";
-import { getRandomEmoji } from "../../../src/utils/getRandomEmoji";
+import { getRandomEmoji } from "../../../src/utils/get-random-emoji";
 import { isValidUrl } from "../../../src/utils/utils";
 import { AddSupply, AddSupplyVariables } from "./__generated__/AddSupply";
 import {
@@ -59,7 +59,7 @@ import { ToggleLocationVote } from "./__generated__/ToggleLocationVote";
 
 const PartyLink = dynamic(
   () => {
-    return import("../../../src/components/PartyLink").then(
+    return import("../../../src/components/party-link").then(
       (mod) => mod.PartyLink
     );
   },
