@@ -278,20 +278,21 @@ const Admin: NextPage = () => {
               />
               {editingParty && <Loader />}
             </Group>
-            {data?.party?.settings.dates.votingEnabled && (
-              <Group>
-                <Checkbox
-                  label="Allow User Suggestions"
-                  color="pink"
-                  checked={data?.party?.settings.dates.optionsEnabled}
-                  onChange={(e) =>
-                    updateParty({ dateOptionsEnabled: e.target.checked })
-                  }
-                  disabled={editingParty}
-                />
-                {editingParty && <Loader />}
-              </Group>
-            )}
+            {data?.party?.settings.dates.votingEnabled &&
+              data.party.dates.length === 0 && (
+                <Group>
+                  <Checkbox
+                    label="Allow User Suggestions"
+                    color="pink"
+                    checked={data?.party?.settings.dates.optionsEnabled}
+                    onChange={(e) =>
+                      updateParty({ dateOptionsEnabled: e.target.checked })
+                    }
+                    disabled={editingParty}
+                  />
+                  {editingParty && <Loader />}
+                </Group>
+              )}
           </Group>
           <Stack>
             {data?.party?.dates.map(({ id, date }) => (
@@ -313,15 +314,16 @@ const Admin: NextPage = () => {
               />
             ))}
             <Group>
-              {data?.party?.settings.locations.votingEnabled && (
-                <DateTimePicker
-                  value={newDate}
-                  onChange={(date) => {
-                    addNewDate(date);
-                  }}
-                  disabled={addingNewDate}
-                />
-              )}
+              {data?.party?.settings.locations.votingEnabled &&
+                data.party.locations.length === 0 && (
+                  <DateTimePicker
+                    value={newDate}
+                    onChange={(date) => {
+                      addNewDate(date);
+                    }}
+                    disabled={addingNewDate}
+                  />
+                )}
               {addingNewDate && <Loader />}
             </Group>
             <Button
