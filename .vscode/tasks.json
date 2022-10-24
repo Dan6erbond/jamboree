@@ -26,6 +26,12 @@
         "runOn": "folderOpen"
       },
       "problemMatcher": []
+    },
+    {
+      "label": "Deploy project to Vercel",
+      "type": "shell",
+      "command": "vercel build && vercel deploy --prebuilt",
+      "problemMatcher": []
     }
   ]
 }
