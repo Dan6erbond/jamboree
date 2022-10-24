@@ -13,7 +13,7 @@ import {
 import { useColorScheme, useHotkeys, useLocalStorage } from "@mantine/hooks";
 import { IconMoon, IconSunHigh } from "@tabler/icons";
 import { getCookie, setCookie } from "cookies-next";
-import { EmojiStyle } from "emoji-picker-react";
+import type { EmojiStyle } from "emoji-picker-react";
 import { GetServerSidePropsContext } from "next";
 import type { AppProps } from "next/app";
 import dynamic from "next/dynamic";
@@ -91,7 +91,10 @@ function MyApp({ Component, pageProps }: AppProps) {
                       >
                         Jamboree
                       </Title>
-                      <Emoji unified="1f389" emojiStyle={EmojiStyle.TWITTER} />
+                      <Emoji
+                        unified="1f389"
+                        emojiStyle={"twitter" as EmojiStyle.TWITTER}
+                      />
                     </Group>
                   </Link>
                   <ActionIcon onClick={() => toggleColorScheme()}>
