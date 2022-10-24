@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "download-schema": "apollo service:download --endpoint=https://$NEXT_PUBLIC_JAMBOREE_API_HOST$NEXT_PUBLIC_JAMBOREE_API_PATH graphql-schema.json",
+    "download-schema": "apollo service:download --endpoint=$JAMBOREE_API_URL graphql-schema.json",
     "codegen": "apollo codegen:generate --localSchemaFile=graphql-schema.json --includes {pages,src}/**/* --target=typescript --tagName=gql --globalTypesFile=src/types/graphql.ts"
   },
   "dependencies": {
