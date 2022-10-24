@@ -8,7 +8,7 @@ import {
   Group,
   Header,
   MantineProvider,
-  Title
+  Title,
 } from "@mantine/core";
 import { useColorScheme, useHotkeys, useLocalStorage } from "@mantine/hooks";
 import { IconMoon, IconSunHigh } from "@tabler/icons";
@@ -19,7 +19,7 @@ import type { AppProps } from "next/app";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import Link from "next/link";
-import { client } from "../src/apollo-client";
+import { useApollo } from "../src/apollo-client";
 
 const Emoji = dynamic(
   () => import("emoji-picker-react").then((mod) => mod.Emoji),
@@ -27,6 +27,7 @@ const Emoji = dynamic(
 );
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const apolloClient = useApollo(pageProps);
   const preferredColorScheme = useColorScheme();
 
   const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
@@ -57,7 +58,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         />
       </Head>
 
-      <ApolloProvider client={client}>
+      <ApolloProvider client={apolloClient}>
         <ColorSchemeProvider
           colorScheme={colorScheme}
           toggleColorScheme={toggleColorScheme}
@@ -115,7 +116,11 @@ function MyApp({ Component, pageProps }: AppProps) {
   );
 }
 
-MyApp.getInitialProps = ({ ctx }: { ctx: GetServerSidePropsContext }) => ({
+export const getServerSideProps = ({
+  ctx,
+}: {
+  ctx: GetServerSidePropsContext;
+}) => ({
   // get color scheme from cookie
   colorScheme: getCookie("mantine-color-scheme", ctx) || "light",
 });
