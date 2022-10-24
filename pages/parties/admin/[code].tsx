@@ -283,21 +283,20 @@ const Admin: NextPage = () => {
               />
               {editingParty && <Loader />}
             </Group>
-            {data?.party?.settings.dates.votingEnabled &&
-              data.party.dates.length === 0 && (
-                <Group>
-                  <Checkbox
-                    label="Allow User Suggestions"
-                    color="pink"
-                    checked={data?.party?.settings.dates.optionsEnabled}
-                    onChange={(e) =>
-                      updateParty({ dateOptionsEnabled: e.target.checked })
-                    }
-                    disabled={editingParty}
-                  />
-                  {editingParty && <Loader />}
-                </Group>
-              )}
+            {data?.party?.settings.dates.votingEnabled && (
+              <Group>
+                <Checkbox
+                  label="Allow User Suggestions"
+                  color="pink"
+                  checked={data?.party?.settings.dates.optionsEnabled}
+                  onChange={(e) =>
+                    updateParty({ dateOptionsEnabled: e.target.checked })
+                  }
+                  disabled={editingParty}
+                />
+                {editingParty && <Loader />}
+              </Group>
+            )}
           </Group>
           <Stack>
             {data?.party?.dates.map(({ id, date }) => (
@@ -319,16 +318,16 @@ const Admin: NextPage = () => {
               />
             ))}
             <Group>
-              {data?.party?.settings.locations.votingEnabled &&
-                data.party.locations.length === 0 && (
-                  <DateTimePicker
-                    value={newDate}
-                    onChange={(date) => {
-                      addNewDate(date);
-                    }}
-                    disabled={addingNewDate}
-                  />
-                )}
+              {(data?.party?.settings.dates.votingEnabled ||
+                data?.party?.dates.length === 0) && (
+                <DateTimePicker
+                  value={newDate}
+                  onChange={(date) => {
+                    addNewDate(date);
+                  }}
+                  disabled={addingNewDate}
+                />
+              )}
               {addingNewDate && <Loader />}
             </Group>
             <Button
@@ -401,27 +400,28 @@ const Admin: NextPage = () => {
               ))}
               {showNewLocationOption && (
                 <Group>
-                  {data?.party?.settings.locations.votingEnabled && (
-                    <DebouncedTextInput
-                      withAsterisk
-                      icon={<IconMapPin />}
-                      description="A Google Maps link is recommended"
-                      size="md"
-                      sx={(theme) => ({ maxWidth: theme.breakpoints.xs })}
-                      inputWrapperOrder={[
-                        "label",
-                        "input",
-                        "error",
-                        "description",
-                      ]}
-                      placeholder="Add new Location"
-                      value={newLocation}
-                      onChange={newLocationOnChange}
-                      disabled={addingNewLocation}
-                      autoFocus
-                      onFocus={(e) => e.currentTarget.select()}
-                    />
-                  )}
+                  {data?.party?.settings.locations.votingEnabled ||
+                    (data?.party?.locations.length === 0 && (
+                      <DebouncedTextInput
+                        withAsterisk
+                        icon={<IconMapPin />}
+                        description="A Google Maps link is recommended"
+                        size="md"
+                        sx={(theme) => ({ maxWidth: theme.breakpoints.xs })}
+                        inputWrapperOrder={[
+                          "label",
+                          "input",
+                          "error",
+                          "description",
+                        ]}
+                        placeholder="Add new Location"
+                        value={newLocation}
+                        onChange={newLocationOnChange}
+                        disabled={addingNewLocation}
+                        autoFocus
+                        onFocus={(e) => e.currentTarget.select()}
+                      />
+                    ))}
                   {addingNewLocation && <Loader />}
                 </Group>
               )}
