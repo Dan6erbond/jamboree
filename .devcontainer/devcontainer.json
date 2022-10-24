@@ -17,7 +17,8 @@
 		"esbenp.prettier-vscode",
 		"vivaxy.vscode-conventional-commits",
 		"GitHub.vscode-pull-request-github",
-		"yzhang.markdown-all-in-one"
+		"yzhang.markdown-all-in-one",
+		"redhat.vscode-yaml"
 	]
     }
   },
