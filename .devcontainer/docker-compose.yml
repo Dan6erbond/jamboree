@@ -7,6 +7,9 @@ services:
       dockerfile: Dockerfile
       args:
         VARIANT: 16-bullseye
+    environment:
+      JAMBOREE_API_URL: http://backend:5001/graphql
+      NEXT_PUBLIC_JAMBOREE_API_URL: http://backend:5001/graphql
     volumes:
       - ..:/workspace:cached
       - node_modules:/workspace/node_modules
