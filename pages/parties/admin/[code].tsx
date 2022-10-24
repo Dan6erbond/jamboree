@@ -14,10 +14,10 @@ import { NextPage } from "next";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { BotttsAvatar } from "../../../src/components/BotttsAvatar";
-import { DateTimePicker } from "../../../src/components/DateTimePicker";
-import { DebouncedTextInput } from "../../../src/components/DebouncedTextInput";
-import { GET_PARTY } from "../../../src/queries/GetParty";
+import { BotttsAvatar } from "../../../src/components/bottts-avatar";
+import { DateTimePicker } from "../../../src/components/date-time-picker";
+import { DebouncedTextInput } from "../../../src/components/debounced-text-input";
+import { GET_PARTY } from "../../../src/queries/get-party";
 import {
   GetParty,
   GetPartyVariables,
@@ -33,7 +33,7 @@ import { EditParty, EditPartyVariables } from "./__generated__/EditParty";
 
 const PartyLink = dynamic(
   () => {
-    return import("../../../src/components/PartyLink").then(
+    return import("../../../src/components/party-link").then(
       (mod) => mod.PartyLink
     );
   },

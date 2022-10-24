@@ -4,8 +4,8 @@ import { IconArrowBigRightLine, IconHash } from "@tabler/icons";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
-import { UsernameModal } from "../src/components/UsernameModal";
-import { useUsername } from "../src/hooks/useUsername";
+import { UsernameModal } from "../src/components/username-modal";
+import { useUsername } from "../src/hooks/use-username";
 import { CreateParty, CreatePartyVariables } from "./__generated__/CreateParty";
 
 const CREATE_PARTY = gql`
