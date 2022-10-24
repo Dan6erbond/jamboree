@@ -187,9 +187,12 @@ const Join: NextPage = () => {
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       await addNewSupplyMutation();
+      setNewSupplyEmoji(getRandomEmoji().u);
+      setNewSupplyText("");
+      setNewSupplyUrgent(false);
       refetch();
     },
-    [addNewSupplyMutation, refetch]
+    [addNewSupplyMutation, refetch, setNewSupplyEmoji]
   );
 
   const [deleteSupply] = useMutation<DeleteSupply, DeleteSupplyVariables>(
@@ -384,89 +387,92 @@ const Join: NextPage = () => {
             Supplies
           </Title>
           <Divider />
-          {data
-            ?.party!.supplies.sort((supply) => (supply.isUrgent ? 1 : -1))
-            .map(({ assignee, isUrgent, name, quantity, id, emoji }) => (
-              <Group key={id}>
-                <Paper
-                  sx={(theme) => ({
-                    padding: theme.spacing.md,
-                    flex: 1,
-                    borderColor: isUrgent
-                      ? theme.colors.red[7]
-                      : theme.colors.gray[8],
-                    borderWidth: 2,
-                    borderStyle: "solid",
-                  })}
-                >
-                  <Stack>
-                    <Group>
-                      <EmojiPickerButton
-                        value={emoji}
-                        onChange={(e) => updateSupply(id, { emoji: e.unified })}
-                      />
-                      <Group spacing={4} align="top">
-                        <Text size="xl">{quantity}</Text>
-                        <Text size="xl" color="dimmed">
-                          x
-                        </Text>
-                        <Title>{name}</Title>
-                      </Group>
-                      <Box sx={{ flex: 1 }}></Box>
-                      {assignee && (
-                        <Tooltip label={assignee}>
-                          <Avatar
-                            radius="xl"
-                            src={`https://avatars.dicebear.com/api/bottts/${assignee}.svg`}
-                          />
+          {data?.party!.supplies &&
+            [...data.party.supplies]
+              .sort((supply) => (supply.isUrgent ? -1 : 1))
+              .map(({ assignee, isUrgent, name, quantity, id, emoji }) => (
+                <Group key={id}>
+                  <Paper
+                    sx={(theme) => ({
+                      padding: theme.spacing.md,
+                      flex: 1,
+                      borderColor: isUrgent
+                        ? theme.colors.red[7]
+                        : theme.colors.gray[8],
+                      borderWidth: 2,
+                      borderStyle: "solid",
+                    })}
+                  >
+                    <Stack>
+                      <Group>
+                        <EmojiPickerButton
+                          value={emoji}
+                          onChange={(e) =>
+                            updateSupply(id, { emoji: e.unified })
+                          }
+                        />
+                        <Group spacing={4} align="top">
+                          <Text size="xl">{quantity}</Text>
+                          <Text size="xl" color="dimmed">
+                            x
+                          </Text>
+                          <Title>{name}</Title>
+                        </Group>
+                        <Box sx={{ flex: 1 }}></Box>
+                        {assignee && (
+                          <Tooltip label={assignee}>
+                            <Avatar
+                              radius="xl"
+                              src={`https://avatars.dicebear.com/api/bottts/${assignee}.svg`}
+                            />
+                          </Tooltip>
+                        )}
+                        <Tooltip label="Mark as Urgent">
+                          <ActionIcon
+                            color="red"
+                            variant={isUrgent ? "filled" : "light"}
+                            onClick={() =>
+                              updateSupply(id, { isUrgent: !isUrgent })
+                            }
+                          >
+                            <IconUrgent />
+                          </ActionIcon>
                         </Tooltip>
-                      )}
-                      <Tooltip label="Mark as Urgent">
-                        <ActionIcon
-                          color="red"
-                          variant={isUrgent ? "filled" : "light"}
-                          onClick={() =>
-                            updateSupply(id, { isUrgent: !isUrgent })
-                          }
-                        >
-                          <IconUrgent />
-                        </ActionIcon>
-                      </Tooltip>
-                      <Button.Group>
-                        <Button
-                          variant="default"
-                          onClick={() =>
-                            updateSupply(id, { quantity: ++quantity })
-                          }
-                        >
-                          <IconPlus />
-                        </Button>
-                        <Button
-                          variant="default"
-                          onClick={() =>
-                            updateSupply(id, { quantity: --quantity })
-                          }
-                        >
-                          <IconMinus />
-                        </Button>
-                      </Button.Group>
-                    </Group>
-                  </Stack>
-                </Paper>
-                <ActionIcon
-                  variant={assignee === username ? "gradient" : "default"}
-                  size="xl"
-                  sx={{ alignSelf: "stretch", height: "auto", width: 64 }}
-                  onClick={() =>
-                    updateSupply(id, {
-                      assignee: assignee === username ? "" : username,
-                    })
-                  }
-                >
-                  <IconHandStop />
-                </ActionIcon>
-              </Group>
-            ))}
+                        <Button.Group>
+                          <Button
+                            variant="default"
+                            onClick={() =>
+                              updateSupply(id, { quantity: ++quantity })
+                            }
+                          >
+                            <IconPlus />
+                          </Button>
+                          <Button
+                            variant="default"
+                            onClick={() =>
+                              updateSupply(id, { quantity: --quantity })
+                            }
+                          >
+                            <IconMinus />
+                          </Button>
+                        </Button.Group>
+                      </Group>
+                    </Stack>
+                  </Paper>
+                  <ActionIcon
+                    variant={assignee === username ? "gradient" : "default"}
+                    size="xl"
+                    sx={{ alignSelf: "stretch", height: "auto", width: 64 }}
+                    onClick={() =>
+                      updateSupply(id, {
+                        assignee: assignee === username ? "" : username,
+                      })
+                    }
+                  >
+                    <IconHandStop />
+                  </ActionIcon>
+                </Group>
+              ))}
           <Paper
             sx={(theme) => ({
               padding: theme.spacing.md,
