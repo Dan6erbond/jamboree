@@ -257,6 +257,14 @@ const Join: NextPage = () => {
     <Container>
       <Head>
         <title>Join {data?.party?.name} today!</title>
+        <meta
+          property="twitter:title"
+          content={`Join ${data?.party?.name} today!`}
+        />
+        <meta
+          property="og:title"
+          content={`Join ${data?.party?.name} today!`}
+        />
         <meta name="description" content={description} />
         <meta property="og:description" content={description} />
         <meta property="twitter:description" content={description} />

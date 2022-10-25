@@ -60,6 +60,8 @@ function MyApp({ Component, pageProps }: AppProps) {
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
+        <meta property="twitter:title" content="Jamboree" />
+        <meta property="og:title" content="Jamboree" />
         <meta property="og:site_name" content="Jamboree" />
         <meta property="og:type" content="website" />
         <meta property="twitter:card" content="summary" />

@@ -260,6 +260,14 @@ const Admin: NextPage = () => {
     <Container>
       <Head>
         <title>{data?.party?.name} Admin</title>
+        <meta
+          property="twitter:title"
+          content={`${data?.party?.name} Admin`}
+        />
+        <meta
+          property="og:title"
+          content={`${data?.party?.name} Admin`}
+        />
         <meta name="author" content={data?.party?.creator} />
       </Head>
       <Stack>
