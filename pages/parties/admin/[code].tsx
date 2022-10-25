@@ -436,14 +436,6 @@ const Admin: NextPage = () => {
               </Button>
             </Stack>
           </Stack>
-          <Button
-            color="pink"
-            variant="outline"
-            size="md"
-            sx={{ marginLeft: "auto" }}
-          >
-            Save
-          </Button>
         </Stack>
         <AdminZoneBanner />
       </Stack>
