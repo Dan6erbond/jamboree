@@ -251,14 +251,15 @@ const Join: NextPage = () => {
     [username, toggleLocationVoteMutation, refetch]
   );
 
+  const description = `Join ${data?.party?.name} and help plan the best party ever!`;
+
   return (
     <Container>
       <Head>
         <title>Join {data?.party?.name} today!</title>
-        <meta
-          name="description"
-          content={`Join ${data?.party?.name} and help plan the best party ever!`}
-        />
+        <meta name="description" content={description} />
+        <meta property="og:description" content={description} />
+        <meta property="twitter:description" content={description} />
         <meta name="author" content={data?.party?.creator} />
       </Head>
       <UsernameModal opened={!username} onSubmit={setUsername} />
