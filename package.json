@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "download-schema": "apollo service:download --endpoint=$JAMBOREE_API_URL graphql-schema.json",
-    "codegen": "apollo codegen:generate --localSchemaFile=graphql-schema.json --includes {pages,src}/**/* --target=typescript --tagName=gql --globalTypesFile=src/types/graphql.ts"
+    "codegen": "apollo codegen:generate --localSchemaFile=graphql-schema.json --includes '{pages,src}/**/*' --target=typescript --tagName=gql --globalTypesFile=src/types/graphql.ts"
   },
   "dependencies": {
     "@apollo/client": "^3.7.0",
