@@ -13,6 +13,7 @@ import { IconMapPin, IconPlus } from "@tabler/icons";
 import { NextPage } from "next";
 import dynamic from "next/dynamic";
 import Head from "next/head";
+
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { BotttsAvatar } from "../../../src/components/bottts-avatar";
