@@ -1,3 +1,6 @@
 {
-  "task.allowAutomaticTasks": "on"
+  "task.allowAutomaticTasks": "on",
+  "path-autocomplete.pathMappings": {
+    "/public": "${workspace}/public"
+  }
 }

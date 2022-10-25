@@ -26,7 +26,6 @@ export const AdminZoneBanner = () => {
           can use it later to edit your party. You can also share this link with
           others.
         </Text>
-        {/* TODO: Make client-side only and add hostname with window.location */}
         <Group position="center">
           <ActionIcon
             color="pink"

@@ -11,7 +11,7 @@ export const PartyLink = ({ partyId, loadingPartyId }: PartyLinkProps) => {
   const clipboard = useClipboard();
 
   const copyPartyUrl = useCallback(() => {
-    clipboard.copy(`${window.location.href}/parties/join/${partyId}`);
+    clipboard.copy(`${window.location.origin}/parties/join/${partyId}`);
   }, [clipboard, partyId]);
 
   return (

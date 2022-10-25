@@ -10,6 +10,7 @@
     "graphql.vscode-graphql-syntax",
     "github.vscode-pull-request-github",
     "yzhang.markdown-all-in-one",
-    "redhat.vscode-yaml"
+    "redhat.vscode-yaml",
+    "ionutvmi.path-autocomplete"
   ]
 }

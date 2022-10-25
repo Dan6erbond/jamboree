@@ -21,6 +21,10 @@ import Head from "next/head";
 import Link from "next/link";
 import { useApollo } from "../src/apollo-client";
 
+const description = "Jamboree is the next-gen party planning app with a smooth and simple UX.";
+const image = `${process.env.VERCEL_URL ?? process.env.NEXT_PUBLIC_URL}/public/emojis/1f389.png`;
+const imageAlt = description;
+
 const Emoji = dynamic(
   () => import("emoji-picker-react").then((mod) => mod.Emoji),
   { ssr: false }
@@ -56,6 +60,21 @@ function MyApp({ Component, pageProps }: AppProps) {
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
+        <meta property="twitter:title" content="Jamboree" />
+        <meta property="og:title" content="Jamboree" />
+        <meta property="og:site_name" content="Jamboree" />
+        <meta property="og:type" content="website" />
+        <meta property="twitter:card" content="summary" />
+        <meta name="robots" content="index, follow" />
+        <meta name="description" content={description} />
+        <meta property="og:description" content={description} />
+        <meta property="twitter:description" content={description} />
+        <meta property="og:image" content={image} />
+        <meta property="og:image:alt" content={imageAlt} />
+        <meta property="twitter:image" content={image} />
+        <meta property="twitter:image:alt" content={imageAlt} />
+        <meta name="keywords" content="Jamboree,Party,GraphQL" />
+        <meta name="author" content="RaviAnand Mohabir" />
       </Head>
 
       <ApolloProvider client={apolloClient}>
