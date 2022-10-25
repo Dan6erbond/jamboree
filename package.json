@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "yarn download-schema && yarn codegen && next build",
+    "prebuild": "yarn download-schema && yarn codegen",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "download-schema": "apollo service:download --endpoint=$JAMBOREE_API_URL graphql-schema.json",
