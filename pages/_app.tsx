@@ -22,7 +22,7 @@ import Link from "next/link";
 import { useApollo } from "../src/apollo-client";
 
 const description = "Jamboree is the next-gen party planning app with a smooth and simple UX.";
-const image = "/public/emojis/1f389.png";
+const image = `${process.env.VERCEL_URL ?? process.env.NEXT_PUBLIC_URL}/public/emojis/1f389.png`;
 const imageAlt = description;
 
 const Emoji = dynamic(
