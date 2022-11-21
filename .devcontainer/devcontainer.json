@@ -34,7 +34,7 @@
   "features": {
     "git": "latest",
     // "git-lfs": "latest",
-    "github-cli": "latest",
+    // "github-cli": "latest",
     "python": "latest"
   }
 }

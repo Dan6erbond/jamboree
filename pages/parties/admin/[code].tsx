@@ -37,13 +37,15 @@ const AdminZoneBanner = dynamic(
   () =>
     import("../../../src/components/admin-zone-banner").then(
       (mod) => mod.AdminZoneBanner
-    ),
+    ) as any,
   { ssr: false }
 );
 
 const PartyLink = dynamic(
   () =>
-    import("../../../src/components/party-link").then((mod) => mod.PartyLink),
+    import("../../../src/components/party-link").then(
+      (mod) => mod.PartyLink
+    ) as any,
   { ssr: false }
 );
 
@@ -444,7 +446,7 @@ const Admin: NextPage = () => {
                 variant="default"
                 sx={{ alignSelf: "start" }}
                 onClick={() => setShowNewLocationOption(true)}
-                disabled={!data?.party?.settings.locations.votingEnabled}
+                disabled={!data?.party?.settings.locations.votingEnabled || addingNewLocation || showNewLocationOption}
               >
                 New Option
               </Button>
