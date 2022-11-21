@@ -444,7 +444,7 @@ const Admin: NextPage = () => {
                 variant="default"
                 sx={{ alignSelf: "start" }}
                 onClick={() => setShowNewLocationOption(true)}
-                disabled={!data?.party?.settings.locations.votingEnabled}
+                disabled={!data?.party?.settings.locations.votingEnabled || addingNewLocation || showNewLocationOption}
               >
                 New Option
               </Button>
