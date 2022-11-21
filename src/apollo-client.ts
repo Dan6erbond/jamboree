@@ -14,7 +14,8 @@ let apolloClient: ApolloClient<NormalizedCacheObject> | undefined;
 export const createApolloClient = () => {
   return new ApolloClient({
     ssrMode: typeof window === "undefined",
-    uri: "http://localhost:5001/graphql",
+    uri:
+      process.env.JAMBOREE_API_URL ?? process.env.NEXT_PUBLIC_JAMBOREE_API_URL,
     cache: new InMemoryCache({
       typePolicies: {
         Party: {
