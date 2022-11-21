@@ -35,18 +35,16 @@ import { EditParty, EditPartyVariables } from "./__generated__/EditParty";
 
 const AdminZoneBanner = dynamic(
   () =>
-  import("../../../src/components/admin-zone-banner").then(
-    (mod) => mod.AdminZoneBanner
-  ) as any,
-{ ssr: false }
+    import("../../../src/components/admin-zone-banner").then(
+      (mod) => mod.AdminZoneBanner
+    ),
+  { ssr: false }
 );
 
 const PartyLink = dynamic(
-() =>
-  import("../../../src/components/party-link").then(
-    (mod) => mod.PartyLink
-  ) as any,
-{ ssr: false }
+  () =>
+    import("../../../src/components/party-link").then((mod) => mod.PartyLink),
+  { ssr: false }
 );
 
 const EDIT_PARTY = gql`
